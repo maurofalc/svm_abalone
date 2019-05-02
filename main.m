@@ -1,4 +1,10 @@
 % Reconhecimento de Padrões
-% SVM
+% SVM - Abalone Dataset
 
-abalone = importdata('abalone.data');
+tbl = readtable('abalone.data','Filetype','text','ReadVariableNames',false);
+
+mdl = fitrsvm(tbl,'Var9','KernelFunction','gaussian','KernelScale',2.2,'Standardize',true);
+
+CVMdl = crossval(mdl);
+
+%openExample('stats/TrainSupportVectorMachineRegressionModelExample');
