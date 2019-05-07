@@ -1,4 +1,4 @@
-%% Reconhecimento de Padrões
+%% Reconhecimento de Padrï¿½es
 % SVM - Abalone Dataset
 
 clear;
@@ -9,7 +9,7 @@ close all;
 tbl = readtable('abalone.data', 'Filetype', 'text', ...
     'ReadVariableNames', true);
 
-%% Separação dos dados.
+%% Separaï¿½ï¿½o dos dados.
 samples = tbl(:, 2:9);
 classes = tbl(:, 1);
 data1 = classes;
@@ -17,13 +17,15 @@ data2 = classes;
 data3 = classes;
 classes = cell2mat(table2array(classes));
 
-%% Parâmetros
+%% Parï¿½metros
 N = height(samples); % Quantidade de amostras.
 K = 10; % Tamanho do K-fold.
-kernel = 'rbf';
-scale = 2.2;
+kernel = 'linear';
+scale = 'auto';
+alpha = 1;
+standardize = true;
 
-%% Preparação das classes e dados
+%% Preparaï¿½ï¿½o das classes e dados
 for i = 1:N
     % Faz com que todos da classe M e F virem classe MF
     if tbl.Sex{i} == 'M' || tbl.Sex{i} == 'F'
@@ -39,7 +41,7 @@ for i = 1:N
     end
 end
 
-% Preparação dos dados para treino.
+% Preparaï¿½ï¿½o dos dados para treino.
 data1 = [data1 samples];
 data2 = [data2 samples];
 data3 = [data3 samples];
@@ -58,26 +60,31 @@ for k = 1:K
     treino = ~teste;
     
     %% Treinamento de cada classificador.
-    mdl1 = fitcsvm(data1(treino, :), 'Sex', 'KernelFunction', ...
-        kernel, 'KernelScale', scale, 'Standardize', true);
-    mdl2 = fitcsvm(data2(treino, :), 'Sex', 'KernelFunction', ...
-        kernel, 'KernelScale', scale, 'Standardize', true);
-    mdl3 = fitcsvm(data3(treino, :), 'Sex', 'KernelFunction', ...
-        kernel, 'KernelScale', scale, 'Standardize', true);
+    mdl1 = fitcsvm(data1(treino, :), 'Sex', 'KernelFunction', kernel, ...
+        'KernelScale', scale, 'Standardize', standardize, ...
+        'Alpha', alpha*ones(sum(treino), 1));
 
-    %% Predição das amostras de teste para cada classificador.
+    mdl2 = fitcsvm(data2(treino, :), 'Sex', 'KernelFunction', kernel, ...
+        'KernelScale', scale, 'Standardize', standardize, ...
+        'Alpha', alpha*ones(sum(treino), 1));
+    
+    mdl3 = fitcsvm(data3(treino, :), 'Sex', 'KernelFunction', kernel, ...
+        'KernelScale', scale, 'Standardize', standardize, ...
+        'Alpha', alpha*ones(sum(treino), 1));
+
+    %% Prediï¿½ï¿½o das amostras de teste para cada classificador.
     [~, score1] = predict(mdl1, samples(teste, :));
     [~, score2] = predict(mdl2, samples(teste, :));
     [~, score3] = predict(mdl3, samples(teste, :));
 
-    % Organização dos scores.
+    % Organizaï¿½ï¿½o dos scores.
     scores = array2table([score1 score2 score3], 'VariableNames', ...
         [mdl1.ClassNames; mdl2.ClassNames; mdl3.ClassNames]);
 
-    % Classe mais provável.
+    % Classe mais provï¿½vel.
     ml = mlclass(scores);
     
-    %% Cálculo da porcentagem de acerto da rodada.
+    %% Cï¿½lculo da porcentagem de acerto da rodada.
     acertos(k) = sum(ml == classes(teste))/sum(teste)*100;
     fprintf("Acerto K=%2d: %2.2f%%\n", k, acertos(k));
     
@@ -85,9 +92,9 @@ for k = 1:K
     realClass = [realClass; classes(teste)];
 end
 
-fprintf("Acerto Médio: %2.2f%%\n", mean(acertos));
+fprintf("Acerto Mï¿½dio: %2.2f%%\n", mean(acertos));
 
-%% Gráficos
+%% Grï¿½ficos
 % Confusion
 target = zeros(3, length(predictedClass));
 out = target;
@@ -129,5 +136,5 @@ set(legend('show'), 'Location', 'best');
 % ylim([0 100]);
 plot(acertos, 'DisplayName', 'Acertos', 'MarkerSize', 20, 'Marker', ...
     '.', 'LineWidth', 2);
-plot(mean(acertos)*ones(1,K), 'DisplayName', 'Acerto Médio', ...
+plot(mean(acertos)*ones(1,K), 'DisplayName', 'Acerto Mï¿½dio', ...
     'LineStyle', '--', 'LineWidth', 2);
