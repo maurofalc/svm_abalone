@@ -1,4 +1,4 @@
-%% Reconhecimento de Padrï¿½es
+%% Reconhecimento de Padrões
 % SVM - Abalone Dataset
 
 clear;
@@ -9,7 +9,7 @@ close all;
 tbl = readtable('abalone.data', 'Filetype', 'text', ...
     'ReadVariableNames', true);
 
-%% Separaï¿½ï¿½o dos dados.
+%% Separação dos dados.
 samples = tbl(:, 2:9);
 classes = tbl(:, 1);
 data1 = classes;
@@ -17,15 +17,15 @@ data2 = classes;
 data3 = classes;
 classes = cell2mat(table2array(classes));
 
-%% Parï¿½metros
+%% Parâmetros
 N = height(samples); % Quantidade de amostras.
 K = 10; % Tamanho do K-fold.
 kernel = 'linear';
-scale = 'auto';
+scale = 10;
 alpha = 1;
 standardize = true;
 
-%% Preparaï¿½ï¿½o das classes e dados
+%% Preparação das classes e dados
 for i = 1:N
     % Faz com que todos da classe M e F virem classe MF
     if tbl.Sex{i} == 'M' || tbl.Sex{i} == 'F'
@@ -41,7 +41,7 @@ for i = 1:N
     end
 end
 
-% Preparaï¿½ï¿½o dos dados para treino.
+% Preparação dos dados para treino.
 data1 = [data1 samples];
 data2 = [data2 samples];
 data3 = [data3 samples];
@@ -72,19 +72,19 @@ for k = 1:K
         'KernelScale', scale, 'Standardize', standardize, ...
         'Alpha', alpha*ones(sum(treino), 1));
 
-    %% Prediï¿½ï¿½o das amostras de teste para cada classificador.
+    %% Predição das amostras de teste para cada classificador.
     [~, score1] = predict(mdl1, samples(teste, :));
     [~, score2] = predict(mdl2, samples(teste, :));
     [~, score3] = predict(mdl3, samples(teste, :));
 
-    % Organizaï¿½ï¿½o dos scores.
+    % Organização dos scores.
     scores = array2table([score1 score2 score3], 'VariableNames', ...
         [mdl1.ClassNames; mdl2.ClassNames; mdl3.ClassNames]);
 
-    % Classe mais provï¿½vel.
+    % Classe mais provável.
     ml = mlclass(scores);
     
-    %% Cï¿½lculo da porcentagem de acerto da rodada.
+    %% Cálculo da porcentagem de acerto da rodada.
     acertos(k) = sum(ml == classes(teste))/sum(teste)*100;
     fprintf("Acerto K=%2d: %2.2f%%\n", k, acertos(k));
     
@@ -92,9 +92,9 @@ for k = 1:K
     realClass = [realClass; classes(teste)];
 end
 
-fprintf("Acerto Mï¿½dio: %2.2f%%\n", mean(acertos));
+fprintf("Acerto Médio: %2.2f%%\n", mean(acertos));
 
-%% Grï¿½ficos
+%% Gráficos
 % Confusion
 target = zeros(3, length(predictedClass));
 out = target;
@@ -136,5 +136,5 @@ set(legend('show'), 'Location', 'best');
 % ylim([0 100]);
 plot(acertos, 'DisplayName', 'Acertos', 'MarkerSize', 20, 'Marker', ...
     '.', 'LineWidth', 2);
-plot(mean(acertos)*ones(1,K), 'DisplayName', 'Acerto Mï¿½dio', ...
+plot(mean(acertos)*ones(1,K), 'DisplayName', 'Acerto Médio', ...
     'LineStyle', '--', 'LineWidth', 2);
