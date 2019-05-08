@@ -20,8 +20,8 @@ classes = cell2mat(table2array(classes));
 %% Parâmetros
 N = height(samples); % Quantidade de amostras.
 K = 10; % Tamanho do K-fold.
-kernel = 'linear';
-scale = 10;
+kernel = 'gaussian';
+scale = 2;
 alpha = 1;
 standardize = true;
 
